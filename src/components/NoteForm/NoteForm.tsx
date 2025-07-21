@@ -1,4 +1,4 @@
-import { ErrorMessage, Field, Form, Formik, type FormikHelpers } from 'formik';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import css from './NoteForm.module.css';
 import { useId } from 'react';
 import * as Yup from 'yup';
@@ -14,6 +14,7 @@ const OrderSchema = Yup.object().shape({
 
 interface NoteFormProps {
   onClose: () => void;
+  onError: (error: string) => void;
 }
 
 const initialValues: NewNote = {
@@ -22,7 +23,7 @@ const initialValues: NewNote = {
   tag: 'Todo',
 };
 
-export default function NoteForm({ onClose }: NoteFormProps) {
+export default function NoteForm({ onClose, onError }: NoteFormProps) {
   const fieldId = useId();
   const queryClient = useQueryClient();
 
@@ -30,13 +31,15 @@ export default function NoteForm({ onClose }: NoteFormProps) {
     mutationFn: (noteData: NewNote) => createNote(noteData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
+      onClose();
+    },
+    onError: error => {
+      onError(error.message);
     },
   });
 
-  const handleSubmit = (values: NewNote, formikHelpers: FormikHelpers<NewNote>) => {
+  const handleSubmit = (values: NewNote) => {
     createNoteMutation.mutate(values);
-    onClose();
-    formikHelpers.resetForm();
   };
 
   return (

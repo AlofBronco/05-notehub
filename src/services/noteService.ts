@@ -9,22 +9,33 @@ interface FetchNotesResponse {
 }
 
 export const fetchNotes = async (query: string, page: number): Promise<FetchNotesResponse> => {
-  const res = await axios.get<FetchNotesResponse>('/notes', {
-    params: {
-      ...(query !== '' && { search: query }),
-      page,
-      perPage: 10,
-    },
-  });
-  return res.data;
+  try {
+    const res = await axios.get<FetchNotesResponse>('/notes', {
+      params: {
+        ...(query !== '' && { search: query }),
+        page,
+      },
+    });
+    return res.data;
+  } catch {
+    throw new Error('Error fetching notes');
+  }
 };
 
 export const createNote = async (noteData: NewNote): Promise<Note> => {
-  const res = await axios.post<Note>('/notes', noteData);
-  return res.data;
+  try {
+    const res = await axios.post<Note>('/notes', noteData);
+    return res.data;
+  } catch {
+    throw new Error('Error creating note');
+  }
 };
 
 export const deleteNote = async (noteId: number): Promise<Note> => {
-  const res = await axios.delete<Note>(`/notes/${noteId}`);
-  return res.data;
+  try {
+    const res = await axios.delete<Note>(`/notes/${noteId}`);
+    return res.data;
+  } catch {
+    throw new Error('Error deleting note');
+  }
 };

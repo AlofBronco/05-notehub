@@ -15,8 +15,9 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [query, setQuery] = useState('');
+  const [mutationError, setMutationError] = useState<string>('');
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['notes', query, currentPage],
     queryFn: () => fetchNotes(query, currentPage),
     placeholderData: keepPreviousData,
@@ -32,7 +33,14 @@ export default function App() {
     setIsModalOpen(false);
   };
 
-  const handleSearch = useDebouncedCallback(setQuery, 300);
+  const handleSearch = useDebouncedCallback((value: string) => {
+    setQuery(value);
+    setCurrentPage(1);
+  }, 300);
+
+  const handleError = (error: string) => {
+    setMutationError(error);
+  };
 
   return (
     <div className={css.app}>
@@ -43,12 +51,13 @@ export default function App() {
           Create note +
         </button>
       </header>
-      {notes && !isLoading && <NoteList notes={notes} />}
+      {notes && !isLoading && <NoteList notes={notes} onError={handleError} />}
       {isLoading && <Loader />}
-      {isError && <Error />}
+      {isError && <Error error={error} />}
+      {mutationError && <Error error={mutationError} />}
       {isModalOpen && (
         <Modal onClose={closeModal}>
-          <NoteForm onClose={closeModal} />
+          <NoteForm onClose={closeModal} onError={handleError} />
         </Modal>
       )}
     </div>

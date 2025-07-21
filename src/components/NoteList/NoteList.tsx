@@ -5,15 +5,19 @@ import { deleteNote } from '../../services/noteService';
 
 interface NoteListProps {
   notes: Note[];
+  onError: (error: string) => void;
 }
 
-export default function NoteList({ notes }: NoteListProps) {
+export default function NoteList({ notes, onError }: NoteListProps) {
   const queryClient = useQueryClient();
 
   const deleteNoteMutation = useMutation({
     mutationFn: (noteId: number) => deleteNote(noteId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+    onError: error => {
+      onError(error.message);
     },
   });
 
