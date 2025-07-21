@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import NoteList from '../NoteList/NoteList';
 import css from './App.module.css';
 import { fetchNotes } from '../../services/noteService';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Pagination from '../Pagination/Pagination';
 import Modal from '../Modal/Modal';
 import NoteForm from '../NoteForm/NoteForm';
@@ -15,7 +15,7 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [query, setQuery] = useState('');
-  const [mutationError, setMutationError] = useState<string>('');
+  const [mutationError, setMutationError] = useState('');
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['notes', query, currentPage],
@@ -42,11 +42,18 @@ export default function App() {
     setMutationError(error);
   };
 
+  useEffect(() => {
+    if (mutationError) {
+      const timer = setTimeout(() => setMutationError(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mutationError]);
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox value={query} onChange={handleSearch} />
-        {totalPages && totalPages > 1 && <Pagination totalPages={totalPages} page={currentPage} setCurrentPage={setCurrentPage} />}
+        {totalPages && totalPages > 1 && <Pagination totalPages={totalPages} page={currentPage} onPageChange={setCurrentPage} />}
         <button className={css.button} onClick={openModal}>
           Create note +
         </button>

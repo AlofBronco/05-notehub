@@ -54,6 +54,10 @@
   background-color: #bb2d3b;
 }
 
+.button:disabled {
+  background-color: #895b5f;
+}
+
 .footer {
   display: flex;
   justify-content: space-between;
