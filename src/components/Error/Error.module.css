@@ -28,3 +28,18 @@
     transform: translate(-50%, -50%);
   }
 }
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+}
+
+.fadeOut {
+  animation: fadeOut 0.5s forwards;
+}
